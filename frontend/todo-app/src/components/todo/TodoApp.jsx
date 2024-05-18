@@ -1,79 +1,61 @@
-import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./TodoApp.css";
+import { LoginComponent } from "./LoginComponent";
+import { WelcomeComponent } from "./WelcomeComponent";
+import { ErrorComponent } from "./ErrorComponent";
+import { ListTodosComponent } from "./ListTodosComponent";
+import { HeaderComponent } from "./HeaderComponent";
+import { LogoutComponent } from "./LogoutComponent";
+import AuthProvider, { useAuth } from "./security/AuthContext";
+
+function AuthenticatedRoute({ children }) {
+  const authContext = useAuth();
+  if (authContext.isAuthenticated) {
+    return children;
+  } else {
+    return <Navigate to="/" />;
+  }
+}
 
 export default function TodoApp() {
   return (
     <div className="TodoApp">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginComponent />}></Route>
-          <Route path="/welcome" element={<WelcomeComponent />}></Route>
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <HeaderComponent />
+          <Routes>
+            <Route path="/" element={<LoginComponent />} />
+            <Route path="/login" element={<LoginComponent />} />
+            <Route
+              path="/welcome/:username"
+              element={
+                <AuthenticatedRoute>
+                  <WelcomeComponent />
+                </AuthenticatedRoute>
+              }
+            />
+            <Route
+              path="/todos"
+              element={
+                <AuthenticatedRoute>
+                  <ListTodosComponent />
+                </AuthenticatedRoute>
+              }
+            />
+            <Route
+              path="/logout"
+              element={
+                <AuthenticatedRoute>
+                  <LogoutComponent />
+                </AuthenticatedRoute>
+              }
+            />
+
+            <Route path="*" element={<ErrorComponent />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </div>
   );
-}
-
-function LoginComponent() {
-  const [username, setUsername] = useState("in28minutes");
-  const [password, setPassword] = useState("password");
-  const [showErrorMessage, setShowErrorMessage] = useState(false);
-  const navigate = useNavigate();
-
-  function handleUsernameChange(event) {
-    setUsername(event.target.value);
-  }
-
-  function handlePasswordChange(event) {
-    setPassword(event.target.value);
-  }
-
-  function handleSubmit() {
-    if (username === "in28minutes" && password === "password") {
-      setShowErrorMessage(false);
-      navigate("/welcome");
-    } else {
-      setShowErrorMessage(true);
-    }
-  }
-
-  return (
-    <div className="Login">
-      {showErrorMessage && (
-        <div className="errorMessage">
-          Authenticated Failed. Please check your credentials.
-        </div>
-      )}
-      <div className="LoginForm">
-        <div>
-          <label>User Name</label>
-          <input
-            type="text"
-            name="username"
-            value={username}
-            onChange={handleUsernameChange}
-          />
-        </div>
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={handlePasswordChange}
-          />
-        </div>
-        <div>
-          <button type="button" name="login" onClick={handleSubmit}>
-            LOGIN
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function WelcomeComponent() {
-  return <div className="Welcome">Welcome Component</div>;
 }
