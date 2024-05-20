@@ -1,8 +1,4 @@
-import axios from "axios";
-
-const apiClient = axios.create({
-  baseURL: "http://localhost:8080",
-});
+import { apiClient } from "./ApiClient";
 
 export const retrieveHelloWorldBean = () => apiClient.get("/hello-world-bean");
 

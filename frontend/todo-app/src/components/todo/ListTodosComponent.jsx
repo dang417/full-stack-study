@@ -26,7 +26,6 @@ export function ListTodosComponent() {
       })
       .catch((error) => console.log(error));
   }
-  useEffect(() => refreshTodos(), []);
 
   function deleteTodo(id) {
     deleteTodoApi(username, id)
@@ -40,6 +39,12 @@ export function ListTodosComponent() {
   function updateTodo(id) {
     navigate(`/todos/${id}`);
   }
+
+  function addNewTodo() {
+    navigate("/todos/-1");
+  }
+
+  useEffect(() => refreshTodos(), []);
 
   return (
     <div className="container">
@@ -82,6 +87,9 @@ export function ListTodosComponent() {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="btn btn-success m-3" onClick={addNewTodo}>
+        Add New Todo
       </div>
     </div>
   );
